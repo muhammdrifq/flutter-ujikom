@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:ujikom/app/data/entertainment_response.dart';
+import 'package:ujikom/app/data/sports_response.dart';
+import 'package:ujikom/app/data/technology_response.dart';
 
+import '../../../data/headline_response.dart';
 import '../controllers/dashboard_controller.dart';
 
 import 'package:lottie/lottie.dart';
@@ -11,9 +15,11 @@ class DashboardView extends GetView<DashboardController> {
 
   @override
   Widget build(BuildContext context) {
+    DashboardController controller = Get.put(DashboardController());
+    final ScrollController scrollController = ScrollController();
     return SafeArea(
         child: DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(120.0),
@@ -47,154 +53,304 @@ class DashboardView extends GetView<DashboardController> {
                     tabs: [
                       Tab(text: "Headline"),
                       Tab(text: "Teknologi"),
-                      Tab(text: "Sains"),
+                      Tab(text: "Olahraga"),
+                      Tab(text: "Hiburan"),
                     ]),
               )
             ],
           ),
         ),
         body: TabBarView(children: [
-          Headline(),
-          Tech(),
-          Sains(),
+          headline(controller, scrollController),
+          technology(controller, scrollController),
+          sports(controller, scrollController),
+          entertainment(controller, scrollController)
         ]),
       ),
     ));
   }
 
-  Center Sains() {
-    return Center(child: Text('Berita Sains'));
+  FutureBuilder<HeadlineResponse> headline(
+      DashboardController controller, ScrollController scrollController) {
+    return FutureBuilder<HeadlineResponse>(
+        future: controller.getHeadline(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: Lottie.network(
+                  'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
+                  repeat: true,
+                  width: MediaQuery.of(context).size.width / 1),
+            );
+          }
+          if (!snapshot.hasData) {
+            return const Center(child: Text("Tidak ada data"));
+          }
+          return ListView.builder(
+            itemCount: snapshot.data!.data!.length,
+            controller: scrollController,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return Container(
+                padding:
+                    const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
+                height: 110,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        snapshot.data!.data![index].urlToImage.toString(),
+                        height: 130,
+                        width: 130,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          snapshot.data!.data![index].title.toString(),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                        const SizedBox(
+                          height: 2,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                'Author : ${snapshot.data!.data![index].author}'),
+                            Text('Sumber : ${snapshot.data!.data![index].name}')
+                          ],
+                        )
+                      ],
+                    ))
+                  ],
+                ),
+              );
+            },
+          );
+        });
   }
 
-  Center Tech() {
-    return Center(child: Text('Berita Teknologi'));
+  FutureBuilder<TechnologyResponse> technology(
+      DashboardController controller, ScrollController scrollController) {
+    return FutureBuilder<TechnologyResponse>(
+        future: controller.getTechnology(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: Lottie.network(
+                  'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
+                  repeat: true,
+                  width: MediaQuery.of(context).size.width / 1),
+            );
+          }
+          if (!snapshot.hasData) {
+            return const Center(child: Text("Tidak ada data"));
+          }
+          return ListView.builder(
+            itemCount: snapshot.data!.data!.length,
+            controller: scrollController,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return Container(
+                padding:
+                    const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
+                height: 110,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        snapshot.data!.data![index].urlToImage.toString(),
+                        height: 130,
+                        width: 130,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          snapshot.data!.data![index].title.toString(),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                        const SizedBox(
+                          height: 2,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                'Author : ${snapshot.data!.data![index].author}'),
+                            Text('Sumber : ${snapshot.data!.data![index].name}')
+                          ],
+                        )
+                      ],
+                    ))
+                  ],
+                ),
+              );
+            },
+          );
+        });
   }
 
-  ListView Headline() {
-    return ListView(
-      shrinkWrap: true,
-      children: [
-        SizedBox(
-          height: 15,
-        ),
-        Card(
-          shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(5)),
-          child: Container(
-            padding: EdgeInsets.only(top: 5, right: 8, left: 8, bottom: 5),
-            height: 110,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network('https://asset.kompas.com/crops/-mgPmvfGHi8QIKUVJaMWc_XlvxU=/0x0:0x0/750x500/data/photo/2022/10/24/6356749947786.jpg'),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: Column(
+  FutureBuilder<SportsResponse> sports(
+      DashboardController controller, ScrollController scrollController) {
+    return FutureBuilder<SportsResponse>(
+        future: controller.getSports(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: Lottie.network(
+                  'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
+                  repeat: true,
+                  width: MediaQuery.of(context).size.width / 1),
+            );
+          }
+          if (!snapshot.hasData) {
+            return const Center(child: Text("Tidak ada data"));
+          }
+          return ListView.builder(
+            itemCount: snapshot.data!.data!.length,
+            controller: scrollController,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return Container(
+                padding:
+                    const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
+                height: 110,
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Ganjar Pranowo digadang-gadang akan menjadi presiden Indonesia'),
-                    SizedBox(
-                      height: 2,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        snapshot.data!.data![index].urlToImage.toString(),
+                        height: 130,
+                        width: 130,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                    Column(
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                        child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Author: Aiman Wicaksono'),
-                        Text('Sumber: Kompas')
+                        Text(
+                          snapshot.data!.data![index].title.toString(),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                        const SizedBox(
+                          height: 2,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                'Author : ${snapshot.data!.data![index].author}'),
+                            Text('Sumber : ${snapshot.data!.data![index].name}')
+                          ],
+                        )
                       ],
-                    )
+                    ))
                   ],
-                ))
-              ],
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 15,
-        ),
-        Card(
-          shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(5)),
-          child: Container(
-            padding: EdgeInsets.only(top: 5, right: 8, left: 8, bottom: 5),
-            height: 110,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network('https://asset.kompas.com/crops/-mgPmvfGHi8QIKUVJaMWc_XlvxU=/0x0:0x0/750x500/data/photo/2022/10/24/6356749947786.jpg'),
                 ),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: Column(
+              );
+            },
+          );
+        });
+  }
+
+  FutureBuilder<EntertainmentResponse> entertainment(
+      DashboardController controller, ScrollController scrollController) {
+    return FutureBuilder<EntertainmentResponse>(
+        future: controller.getEntertainment(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: Lottie.network(
+                  'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
+                  repeat: true,
+                  width: MediaQuery.of(context).size.width / 1),
+            );
+          }
+          if (!snapshot.hasData) {
+            return const Center(child: Text("Tidak ada data"));
+          }
+          return ListView.builder(
+            itemCount: snapshot.data!.data!.length,
+            controller: scrollController,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return Container(
+                padding:
+                    const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
+                height: 110,
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Ganjar Pranowo digadang-gadang akan menjadi presiden Indonesia'),
-                    SizedBox(
-                      height: 2,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        snapshot.data!.data![index].urlToImage.toString(),
+                        height: 130,
+                        width: 130,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Author: Aiman Wicaksono'),
-                        Text('Sumber: Kompas')
-                      ],
-                    )
-                  ],
-                ))
-              ],
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 15,
-        ),
-        Card(
-          shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(5)),
-          child: Container(
-            padding: EdgeInsets.only(top: 5, right: 8, left: 8, bottom: 5),
-            height: 110,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network('https://asset.kompas.com/crops/-mgPmvfGHi8QIKUVJaMWc_XlvxU=/0x0:0x0/750x500/data/photo/2022/10/24/6356749947786.jpg'),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Ganjar Pranowo digadang-gadang akan menjadi presiden Indonesia'),
-                    SizedBox(
-                      height: 2,
+                    const SizedBox(
+                      width: 10,
                     ),
-                    Column(
+                    Expanded(
+                        child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Author: Aiman Wicaksono'),
-                        Text('Sumber: Kompas')
+                        Text(
+                          snapshot.data!.data![index].title.toString(),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                        const SizedBox(
+                          height: 2,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                'Author : ${snapshot.data!.data![index].author}'),
+                            Text('Sumber : ${snapshot.data!.data![index].name}')
+                          ],
+                        )
                       ],
-                    )
+                    ))
                   ],
-                ))
-              ],
-            ),
-          ),
-        )
-      ],
-    );
+                ),
+              );
+            },
+          );
+        });
   }
 }
