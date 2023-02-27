@@ -39,7 +39,7 @@ class LoginController extends GetxController {
       Uri.https(BaseUrl.auth, '/api/login'),
       body: {
         'email': emailController.text,
-        'password': passwordController.text,
+        'password':passwordController.text,
       },
     );
 
@@ -47,6 +47,7 @@ class LoginController extends GetxController {
         jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
     if (decodedResponse['success'] == true) {
       authToken.write('token', decodedResponse['access_token']);
+      authToken.write('full_name', decodedResponse['full_name']);
       Get.offAll(() => const DashboardView());
     } else {
       Get.snackbar('Error', decodedResponse['message'].toString(),

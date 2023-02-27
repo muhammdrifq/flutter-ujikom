@@ -17,14 +17,14 @@ class LoginView extends GetView<LoginController> {
   Widget build(BuildContext context) {
     LoginController controller = Get.put(LoginController());
     return Scaffold(
-      backgroundColor: HexColor('#feeee8'),
+      backgroundColor: HexColor('#0F1822'),
       body: SingleChildScrollView(
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 70.0),
-              child: Lottie.network(
-                'https://gist.githubusercontent.com/olipiskandar/2095343e6b34255dcfb042166c4a3283/raw/d76e1121a2124640481edcf6e7712130304d6236/praujikom_kucing.json',
+              child: Image.network(
+                'https://cdn.dribbble.com/users/2348/screenshots/10696082/media/4a24583ea649f9df1415775a37c84ae5.png',
                 fit: BoxFit.cover,
               ),
             ),
@@ -33,8 +33,11 @@ class LoginView extends GetView<LoginController> {
               child: TextField(
                 controller: controller.emailController,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderSide: BorderSide(color: Colors.amberAccent)
+                    ),
+                    labelText: 'Email', 
                     hintText: 'Masukan Email'),
               ),
             ),
@@ -44,9 +47,12 @@ class LoginView extends GetView<LoginController> {
               child: TextField(
                 controller: controller.passwordController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Password',
+               decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderSide: BorderSide(color: Colors.amberAccent)
+                    ),
+                    labelText: 'Password', 
                     hintText: 'Masukan Password'),
               ),
             ),
