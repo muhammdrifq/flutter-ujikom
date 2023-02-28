@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:get/get.dart';
+import 'package:ujikom/app/data/agents_response.dart';
 import 'package:ujikom/app/utils/api.dart';
 import '../../../data/entertainment_response.dart';
 import '../../../data/headline_response.dart';
@@ -30,6 +31,11 @@ class DashboardController extends GetxController {
   Future<TechnologyResponse> getTechnology() async{
     final response = await _getConnect.get(BaseUrl.technology);
     return TechnologyResponse.fromJson(jsonDecode(response.body));  
+  }
+
+  Future<AgentsResponse> getAgents() async{
+    final response = await _getConnect.get(ValoUrl.agents);
+    return AgentsResponse.fromJson(jsonDecode(response.body));  
   }
 
   final count = 0.obs;
