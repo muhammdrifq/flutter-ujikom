@@ -27,7 +27,7 @@ class DashboardView extends GetView<DashboardController> {
     final auth = GetStorage();
     return SafeArea(
         child: DefaultTabController(
-      length: 5,
+      length: 6,
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
@@ -71,7 +71,8 @@ class DashboardView extends GetView<DashboardController> {
                       Tab(text: "Teknologi"),
                       Tab(text: "Olahraga"),
                       Tab(text: "Hiburan"),
-                      Tab(text: "Profile")
+                      Tab(text: "Profile"),
+                      Tab(text: 'Agents')
                     ]),
               )
             ],
@@ -82,7 +83,9 @@ class DashboardView extends GetView<DashboardController> {
           technology(controller, scrollController),
           sports(controller, scrollController),
           entertainment(controller, scrollController),
-          ProfileWidget()
+          ProfileWidget(),
+          agents(controller, scrollController)
+          
         ]),
       ),
     ));
@@ -371,6 +374,78 @@ class DashboardView extends GetView<DashboardController> {
           );
         });
   }
+
+  FutureBuilder<AgentsResponse> agents(
+      DashboardController controller, ScrollController scrollController) {
+    return FutureBuilder<AgentsResponse>(
+        future: controller.getAgents(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: Lottie.network(
+                  'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
+                  repeat: true,
+                  width: MediaQuery.of(context).size.width / 1),
+            );
+          }
+          if (!snapshot.hasData) {
+            return const Center(child: Text("Tidak ada data"));
+          }
+          return ListView.builder(
+            itemCount: snapshot.data!.data!.length,
+            controller: scrollController,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return Container(
+                padding:
+                    const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
+                height: 110,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        snapshot.data!.data![index].displayIcon.toString(),
+                        height: 130,
+                        width: 130,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          snapshot.data!.data![index].displayName.toString(),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                        const SizedBox(
+                          height: 2,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                'Author : ${snapshot.data!.data![index].characterTags}'),
+                            // Text('Sumber : ${snapshot.data!.data![index].name}')
+                          ],
+                        )
+                      ],
+                    ))
+                  ],
+                ),
+              );
+            },
+          );
+        });
+  }
+
 }
 
 class ProfileWidget extends StatelessWidget {
@@ -396,7 +471,7 @@ class ProfileWidget extends StatelessWidget {
             borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(10), topRight: Radius.circular(10)),
             body: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   image: DecorationImage(
                       image: NetworkImage(
                         'https://marketplace.canva.com/EAFHm4JWsu8/1/0/1600w/canva-pink-landscape-desktop-wallpaper-HGxdJA_xIx0.jpg',

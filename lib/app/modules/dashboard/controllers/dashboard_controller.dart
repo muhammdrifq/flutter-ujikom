@@ -7,11 +7,13 @@ import '../../../data/entertainment_response.dart';
 import '../../../data/headline_response.dart';
 import '../../../data/sports_response.dart';
 import '../../../data/technology_response.dart';
+import 'package:http/http.dart' as http;
 
 class DashboardController extends GetxController {
   //TODO: Implement DashboardController
 
   final _getConnect = GetConnect();
+  var client = http.Client();
 
   Future<HeadlineResponse> getHeadline() async{
     final response = await _getConnect.get(BaseUrl.headline);
@@ -34,7 +36,7 @@ class DashboardController extends GetxController {
   }
 
   Future<AgentsResponse> getAgents() async{
-    final response = await _getConnect.get(ValoUrl.agents);
+    final response = await client.get(Uri.https(ValoUrl.agents));
     return AgentsResponse.fromJson(jsonDecode(response.body));  
   }
 
