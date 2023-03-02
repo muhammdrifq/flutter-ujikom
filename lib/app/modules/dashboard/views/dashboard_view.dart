@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -14,6 +16,7 @@ import '../controllers/dashboard_controller.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:icon/icon.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'dart:developer';
 
 import 'package:lottie/lottie.dart';
 
@@ -26,426 +29,351 @@ class DashboardView extends GetView<DashboardController> {
     final ScrollController scrollController = ScrollController();
     final auth = GetStorage();
     return SafeArea(
-        child: DefaultTabController(
-      length: 6,
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            await auth.erase();
-            Get.offAll(() => const HomeView());
-          },
-          backgroundColor: Colors.redAccent,
-          child: const Icon(Icons.logout_rounded),
-        ),
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(120.0),
-          child: Column(
-            children: [
-              ListTile(
-                title: const Text(
-                  'Hallo!',
-                  textAlign: TextAlign.end,
-                ),
-                subtitle: Text(
-                  auth.read('full_name').toString(),
-                  textAlign: TextAlign.end,
-                ),
-                trailing: Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  width: 50.0,
-                  height: 50,
-                  child: Lottie.network(
-                      'https://gist.githubusercontent.com/olipiskandar/2095343e6b34255dcfb042166c4a3283/raw/d76e1121a2124640481edcf6e7712130304d6236/praujikom_kucing.json',
-                      fit: BoxFit.cover),
-                ),
+        child: Scaffold(
+            backgroundColor: HexColor("#0F1822"),
+            appBar: AppBar(
+              centerTitle: true,
+              backgroundColor: HexColor('#0F1822'),
+              title: Text(
+                'Valorant Agents',
+                style: GoogleFonts.turretRoad(
+                    color: HexColor("#ff4654"),
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold),
               ),
-              const Align(
-                alignment: Alignment.topLeft,
-                child: TabBar(
-                    labelColor: Colors.black,
-                    indicatorSize: TabBarIndicatorSize.label,
-                    isScrollable: true,
-                    indicatorColor: Colors.white,
-                    tabs: [
-                      Tab(text: "Headline"),
-                      Tab(text: "Teknologi"),
-                      Tab(text: "Olahraga"),
-                      Tab(text: "Hiburan"),
-                      Tab(text: "Profile"),
-                      Tab(text: 'Agents')
-                    ]),
-              )
-            ],
-          ),
-        ),
-        body: TabBarView(children: [
-          headline(controller, scrollController),
-          technology(controller, scrollController),
-          sports(controller, scrollController),
-          entertainment(controller, scrollController),
-          ProfileWidget(),
-          agents(controller, scrollController)
-          
-        ]),
-      ),
-    ));
+            ),
+            body: agents(controller, scrollController)));
   }
 
-  FutureBuilder<HeadlineResponse> headline(
+  Obx agents(
       DashboardController controller, ScrollController scrollController) {
-    return FutureBuilder<HeadlineResponse>(
-        future: controller.getHeadline(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: Lottie.network(
-                  'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
-                  repeat: true,
-                  width: MediaQuery.of(context).size.width / 1),
-            );
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: Text("Tidak ada data"));
-          }
-          return ListView.builder(
-            itemCount: snapshot.data!.data!.length,
-            controller: scrollController,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              return Container(
-                padding:
-                    const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
-                height: 110,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        snapshot.data!.data![index].urlToImage.toString(),
-                        height: 130,
-                        width: 130,
-                        fit: BoxFit.cover,
+    return Obx(() => ListView.builder(
+          itemCount: controller.agentsList.length,
+          controller: scrollController,
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            return Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: HexColor("#ff4654"),
+                        spreadRadius: 0,
+                        blurRadius: 12,
+                        offset: Offset(0, 0)
                       ),
+                      
+                      
+
+                    ]
+                  ),
+                  
+                  padding: const EdgeInsets.only(
+                      top: 5, left: 8, right: 8, bottom: 5),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      
+                      controller.agentsList[index].photo!,
+                      fit: BoxFit.cover,
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          snapshot.data!.data![index].title.toString(),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                'Author : ${snapshot.data!.data![index].author}'),
-                            Text('Sumber : ${snapshot.data!.data![index].name}')
-                          ],
-                        )
-                      ],
-                    ))
-                  ],
+                  ),
                 ),
-              );
-            },
-          );
-        });
+                SizedBox(
+                  height: 10,
+                )
+              ],
+            );
+          },
+        ));
   }
 
-  FutureBuilder<TechnologyResponse> technology(
-      DashboardController controller, ScrollController scrollController) {
-    return FutureBuilder<TechnologyResponse>(
-        future: controller.getTechnology(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: Lottie.network(
-                  'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
-                  repeat: true,
-                  width: MediaQuery.of(context).size.width / 1),
-            );
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: Text("Tidak ada data"));
-          }
-          return ListView.builder(
-            itemCount: snapshot.data!.data!.length,
-            controller: scrollController,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              return Container(
-                padding:
-                    const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
-                height: 110,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        snapshot.data!.data![index].urlToImage.toString(),
-                        height: 130,
-                        width: 130,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          snapshot.data!.data![index].title.toString(),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                'Author : ${snapshot.data!.data![index].author}'),
-                            Text('Sumber : ${snapshot.data!.data![index].name}')
-                          ],
-                        )
-                      ],
-                    ))
-                  ],
-                ),
-              );
-            },
-          );
-        });
-  }
+  // FutureBuilder<HeadlineResponse> headline(
+  //     DashboardController controller, ScrollController scrollController) {
+  //   return FutureBuilder<HeadlineResponse>(
+  //       future: controller.getHeadline(),
+  //       builder: (context, snapshot) {
+  //         if (snapshot.connectionState == ConnectionState.waiting) {
+  //           return Center(
+  //             child: Lottie.network(
+  //                 'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
+  //                 repeat: true,
+  //                 width: MediaQuery.of(context).size.width / 1),
+  //           );
+  //         }
+  //         if (!snapshot.hasData) {
+  //           return const Center(child: Text("Tidak ada data"));
+  //         }
+  //         return ListView.builder(
+  //           itemCount: snapshot.data!.data!.length,
+  //           controller: scrollController,
+  //           shrinkWrap: true,
+  //           itemBuilder: (context, index) {
+  //             return Container(
+  //               padding:
+  //                   const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
+  //               height: 110,
+  //               child: Row(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   ClipRRect(
+  //                     borderRadius: BorderRadius.circular(8.0),
+  //                     child: Image.network(
+  //                       snapshot.data!.data![index].urlToImage.toString(),
+  //                       height: 130,
+  //                       width: 130,
+  //                       fit: BoxFit.cover,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(
+  //                     width: 10,
+  //                   ),
+  //                   Expanded(
+  //                       child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text(
+  //                         snapshot.data!.data![index].title.toString(),
+  //                         overflow: TextOverflow.ellipsis,
+  //                         maxLines: 2,
+  //                       ),
+  //                       const SizedBox(
+  //                         height: 2,
+  //                       ),
+  //                       Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           Text(
+  //                               'Author : ${snapshot.data!.data![index].author}'),
+  //                           Text('Sumber : ${snapshot.data!.data![index].name}')
+  //                         ],
+  //                       )
+  //                     ],
+  //                   ))
+  //                 ],
+  //               ),
+  //             );
+  //           },
+  //         );
+  //       });
+  // }
 
-  FutureBuilder<SportsResponse> sports(
-      DashboardController controller, ScrollController scrollController) {
-    return FutureBuilder<SportsResponse>(
-        future: controller.getSports(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: Lottie.network(
-                  'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
-                  repeat: true,
-                  width: MediaQuery.of(context).size.width / 1),
-            );
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: Text("Tidak ada data"));
-          }
-          return ListView.builder(
-            itemCount: snapshot.data!.data!.length,
-            controller: scrollController,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              return Container(
-                padding:
-                    const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
-                height: 110,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        snapshot.data!.data![index].urlToImage.toString(),
-                        height: 130,
-                        width: 130,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          snapshot.data!.data![index].title.toString(),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                'Author : ${snapshot.data!.data![index].author}'),
-                            Text('Sumber : ${snapshot.data!.data![index].name}')
-                          ],
-                        )
-                      ],
-                    ))
-                  ],
-                ),
-              );
-            },
-          );
-        });
-  }
+  // FutureBuilder<TechnologyResponse> technology(
+  //     DashboardController controller, ScrollController scrollController) {
+  //   return FutureBuilder<TechnologyResponse>(
+  //       future: controller.getTechnology(),
+  //       builder: (context, snapshot) {
+  //         if (snapshot.connectionState == ConnectionState.waiting) {
+  //           return Center(
+  //             child: Lottie.network(
+  //                 'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
+  //                 repeat: true,
+  //                 width: MediaQuery.of(context).size.width / 1),
+  //           );
+  //         }
+  //         if (!snapshot.hasData) {
+  //           return const Center(child: Text("Tidak ada data"));
+  //         }
+  //         return ListView.builder(
+  //           itemCount: snapshot.data!.data!.length,
+  //           controller: scrollController,
+  //           shrinkWrap: true,
+  //           itemBuilder: (context, index) {
+  //             return Container(
+  //               padding:
+  //                   const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
+  //               height: 110,
+  //               child: Row(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   ClipRRect(
+  //                     borderRadius: BorderRadius.circular(8.0),
+  //                     child: Image.network(
+  //                       snapshot.data!.data![index].urlToImage.toString(),
+  //                       height: 130,
+  //                       width: 130,
+  //                       fit: BoxFit.cover,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(
+  //                     width: 10,
+  //                   ),
+  //                   Expanded(
+  //                       child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text(
+  //                         snapshot.data!.data![index].title.toString(),
+  //                         overflow: TextOverflow.ellipsis,
+  //                         maxLines: 2,
+  //                       ),
+  //                       const SizedBox(
+  //                         height: 2,
+  //                       ),
+  //                       Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           Text(
+  //                               'Author : ${snapshot.data!.data![index].author}'),
+  //                           Text('Sumber : ${snapshot.data!.data![index].name}')
+  //                         ],
+  //                       )
+  //                     ],
+  //                   ))
+  //                 ],
+  //               ),
+  //             );
+  //           },
+  //         );
+  //       });
+  // }
 
-  FutureBuilder<EntertainmentResponse> entertainment(
-      DashboardController controller, ScrollController scrollController) {
-    return FutureBuilder<EntertainmentResponse>(
-        future: controller.getEntertainment(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: Lottie.network(
-                  'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
-                  repeat: true,
-                  width: MediaQuery.of(context).size.width / 1),
-            );
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: Text("Tidak ada data"));
-          }
-          return ListView.builder(
-            itemCount: snapshot.data!.data!.length,
-            controller: scrollController,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              return Container(
-                padding:
-                    const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
-                height: 110,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        snapshot.data!.data![index].urlToImage.toString(),
-                        height: 130,
-                        width: 130,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          snapshot.data!.data![index].title.toString(),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                'Author : ${snapshot.data!.data![index].author}'),
-                            Text('Sumber : ${snapshot.data!.data![index].name}')
-                          ],
-                        )
-                      ],
-                    ))
-                  ],
-                ),
-              );
-            },
-          );
-        });
-  }
+  // FutureBuilder<SportsResponse> sports(
+  //     DashboardController controller, ScrollController scrollController) {
+  //   return FutureBuilder<SportsResponse>(
+  //       future: controller.getSports(),
+  //       builder: (context, snapshot) {
+  //         if (snapshot.connectionState == ConnectionState.waiting) {
+  //           return Center(
+  //             child: Lottie.network(
+  //                 'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
+  //                 repeat: true,
+  //                 width: MediaQuery.of(context).size.width / 1),
+  //           );
+  //         }
+  //         if (!snapshot.hasData) {
+  //           return const Center(child: Text("Tidak ada data"));
+  //         }
+  //         return ListView.builder(
+  //           itemCount: snapshot.data!.data!.length,
+  //           controller: scrollController,
+  //           shrinkWrap: true,
+  //           itemBuilder: (context, index) {
+  //             return Container(
+  //               padding:
+  //                   const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
+  //               height: 110,
+  //               child: Row(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   ClipRRect(
+  //                     borderRadius: BorderRadius.circular(8.0),
+  //                     child: Image.network(
+  //                       snapshot.data!.data![index].urlToImage.toString(),
+  //                       height: 130,
+  //                       width: 130,
+  //                       fit: BoxFit.cover,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(
+  //                     width: 10,
+  //                   ),
+  //                   Expanded(
+  //                       child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text(
+  //                         snapshot.data!.data![index].title.toString(),
+  //                         overflow: TextOverflow.ellipsis,
+  //                         maxLines: 2,
+  //                       ),
+  //                       const SizedBox(
+  //                         height: 2,
+  //                       ),
+  //                       Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           Text(
+  //                               'Author : ${snapshot.data!.data![index].author}'),
+  //                           Text('Sumber : ${snapshot.data!.data![index].name}')
+  //                         ],
+  //                       )
+  //                     ],
+  //                   ))
+  //                 ],
+  //               ),
+  //             );
+  //           },
+  //         );
+  //       });
+  // }
 
-  FutureBuilder<AgentsResponse> agents(
-      DashboardController controller, ScrollController scrollController) {
-    return FutureBuilder<AgentsResponse>(
-        future: controller.getAgents(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: Lottie.network(
-                  'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
-                  repeat: true,
-                  width: MediaQuery.of(context).size.width / 1),
-            );
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: Text("Tidak ada data"));
-          }
-          return ListView.builder(
-            itemCount: snapshot.data!.data!.length,
-            controller: scrollController,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              return Container(
-                padding:
-                    const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
-                height: 110,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        snapshot.data!.data![index].displayIcon.toString(),
-                        height: 130,
-                        width: 130,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          snapshot.data!.data![index].displayName.toString(),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                'Author : ${snapshot.data!.data![index].characterTags}'),
-                            // Text('Sumber : ${snapshot.data!.data![index].name}')
-                          ],
-                        )
-                      ],
-                    ))
-                  ],
-                ),
-              );
-            },
-          );
-        });
-  }
-
+  // FutureBuilder<EntertainmentResponse> entertainment(
+  //     DashboardController controller, ScrollController scrollController) {
+  //   return FutureBuilder<EntertainmentResponse>(
+  //       future: controller.getEntertainment(),
+  //       builder: (context, snapshot) {
+  //         if (snapshot.connectionState == ConnectionState.waiting) {
+  //           return Center(
+  //             child: Lottie.network(
+  //                 'https://gist.githubusercontent.com/olipiskandar/4f08ac098c81c32ebc02c55f5b11127b/raw/6e21dc500323da795e8b61b5558748b5c7885157/loading.json',
+  //                 repeat: true,
+  //                 width: MediaQuery.of(context).size.width / 1),
+  //           );
+  //         }
+  //         if (!snapshot.hasData) {
+  //           return const Center(child: Text("Tidak ada data"));
+  //         }
+  //         return ListView.builder(
+  //           itemCount: snapshot.data!.data!.length,
+  //           controller: scrollController,
+  //           shrinkWrap: true,
+  //           itemBuilder: (context, index) {
+  //             return Container(
+  //               padding:
+  //                   const EdgeInsets.only(top: 5, left: 8, right: 8, bottom: 5),
+  //               height: 110,
+  //               child: Row(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   ClipRRect(
+  //                     borderRadius: BorderRadius.circular(8.0),
+  //                     child: Image.network(
+  //                       snapshot.data!.data![index].urlToImage.toString(),
+  //                       height: 130,
+  //                       width: 130,
+  //                       fit: BoxFit.cover,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(
+  //                     width: 10,
+  //                   ),
+  //                   Expanded(
+  //                       child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text(
+  //                         snapshot.data!.data![index].title.toString(),
+  //                         overflow: TextOverflow.ellipsis,
+  //                         maxLines: 2,
+  //                       ),
+  //                       const SizedBox(
+  //                         height: 2,
+  //                       ),
+  //                       Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           Text(
+  //                               'Author : ${snapshot.data!.data![index].author}'),
+  //                           Text('Sumber : ${snapshot.data!.data![index].name}')
+  //                         ],
+  //                       )
+  //                     ],
+  //                   ))
+  //                 ],
+  //               ),
+  //             );
+  //           },
+  //         );
+  //       });
+  // }
 }
 
 class ProfileWidget extends StatelessWidget {
@@ -576,7 +504,6 @@ class ProfileWidget extends StatelessWidget {
                                     child: Lottie.network(
                                         'https://assets10.lottiefiles.com/packages/lf20_cwqf5i6h.json'),
                                   ),
-                                  
                                 ],
                               )),
                           Container(

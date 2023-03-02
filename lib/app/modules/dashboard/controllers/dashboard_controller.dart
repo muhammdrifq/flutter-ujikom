@@ -14,6 +14,7 @@ class DashboardController extends GetxController {
 
   final _getConnect = GetConnect();
   var client = http.Client();
+  final agentsList = [].obs;
 
   Future<HeadlineResponse> getHeadline() async{
     final response = await _getConnect.get(BaseUrl.headline);
@@ -35,14 +36,25 @@ class DashboardController extends GetxController {
     return TechnologyResponse.fromJson(jsonDecode(response.body));  
   }
 
-  Future<AgentsResponse> getAgents() async{
-    final response = await client.get(Uri.https(ValoUrl.agents));
-    return AgentsResponse.fromJson(jsonDecode(response.body));  
+  void fetchAgents() async {
+    try {
+      var response = await http.get(Uri.parse(ValoUrl.agents));
+      var agents = <AgentsResponse>[];
+
+      if(response.statusCode == 200) {
+        var agentsJson = json.decode(response.body);
+        for ( var agent in agentsJson){
+          agents.add(AgentsResponse.fromJson(agent));
+        }
+      }
+      agentsList.assignAll(agents);
+    } finally{}
   }
 
   final count = 0.obs;
   @override
   void onInit() {
+    fetchAgents();
     super.onInit();
   }
 
@@ -58,3 +70,4 @@ class DashboardController extends GetxController {
 
   void increment() => count.value++;
 }
+

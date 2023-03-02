@@ -11,7 +11,6 @@ class BaseUrl {
 }
 
 class ValoUrl {
-  static String agents = 'https://valorant-api.com';
-  static String agentsEndpoint = '/v1/agents';
+  static String agents = 'https://valo-agents-iqi.netlify.app/.netlify/functions/api/valo-agents';
   
 }

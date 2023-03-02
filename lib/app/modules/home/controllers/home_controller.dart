@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:ujikom/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:ujikom/app/modules/login/views/login_view.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:ujikom/app/routes/app_pages.dart';
 
 class HomeController extends GetxController {
   //TODO: Implement HomeController
@@ -15,12 +16,7 @@ class HomeController extends GetxController {
   void onInit() {
     _pindah = Timer.periodic(
       const Duration(seconds: 4,),
-      (timer) => authToken.read('token') == null
-       ? Get.off(
-        () => LoginView(),
-        transition: Transition.leftToRight
-      )
-      : Get.off(() => const DashboardView())
+      (timer) => Get.offNamed( Routes.DASHBOARD) 
       );
     super.onInit();
   }

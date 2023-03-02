@@ -16,27 +16,25 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     HomeController controller = Get.put(HomeController());
     return Scaffold(
-      backgroundColor: HexColor('#feeee8'),
-      body: Center(
+      backgroundColor: HexColor('#0F1822'),
+      body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Lottie.network(
-              'https://gist.githubusercontent.com/olipiskandar/2095343e6b34255dcfb042166c4a3283/raw/d76e1121a2124640481edcf6e7712130304d6236/praujikom_kucing.json',
-              fit: BoxFit.cover,
+            Padding(
+              padding: const EdgeInsets.only(top: 70.0),
+              child: Image.network(
+                'https://cdn.dribbble.com/users/2348/screenshots/10696082/media/4a24583ea649f9df1415775a37c84ae5.png',
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(
-              height: 15,
+              height: 10,
             ),
-            Text(
-              'Aplikasi Portal Berita Indonesia',
-              style: GoogleFonts.roboto(
-                textStyle: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30
-                )
-              ),
+            Container(
+              width: 170,
+              height: 170,
+              child: Lottie.network(
+                  'https://assets9.lottiefiles.com/packages/lf20_nrzmbfyy.json'),
             )
           ],
         ),
